@@ -7,9 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Utils {
-    static class InitialPosition {
-        String piece;
-        String position;
+    public static class InitialPosition {
+        public String piece;
+        public String position;
 
         public InitialPosition(String pc, String pos) {
             piece = pc;
@@ -21,12 +21,12 @@ public class Utils {
         }
     }
 
-    static class TestCase {
+    public static class TestCase {
 
-        List<InitialPosition> initialPieces;
-        List<String> upperCaptures;
-        List<String> lowerCaptures;
-        List<String> moves;
+        public List<InitialPosition> initialPieces;
+        public List<String> upperCaptures;
+        public List<String> lowerCaptures;
+        public List<String> moves;
 
         public TestCase(List<InitialPosition> ip, List<String> uc, List<String> lc, List<String> m) {
             initialPieces = ip;
@@ -111,12 +111,13 @@ public class Utils {
         List<String> upperCaptures = Arrays.asList(line.substring(1, line.length() - 1).split(" "));
         line = br.readLine().trim();
         List<String> lowerCaptures = Arrays.asList(line.substring(1, line.length() - 1).split(" "));
-        line = br.readLine().trim();
-        line = br.readLine().trim();
-        List<String> moves = new ArrayList<String>();
+        line = br.readLine();
+        List<String> moves = new ArrayList<>();
         while (line != null) {
             line = line.trim();
-            moves.add(line);
+            if (!line.isEmpty()) {
+                moves.add(line);
+            }
             line = br.readLine();
         }
 
