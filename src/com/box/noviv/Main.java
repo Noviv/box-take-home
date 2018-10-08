@@ -2,6 +2,8 @@ package com.box.noviv;
 
 import com.box.noviv.game.Minishogi;
 
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
         Minishogi g;
@@ -14,5 +16,15 @@ public class Main {
         }
 
         // start parsing from stdin
+        Scanner input = new Scanner(System.in);
+        while (g.isRunning()) {
+            g.prompt();
+            String[] line = input.nextLine().split(" ");
+            if (line.length < 3) {
+                System.out.println("failed");
+                return;
+            }
+            g.makeMove(line);
+        }
     }
 }
