@@ -20,17 +20,12 @@ public class Minishogi {
         }
 
         for (InitialPosition ip : tc.initialPieces) {
-            int x = convert(ip.position.charAt(1));
-            int y = convert(ip.position.charAt(0));
-            board.set(x, y, pm.get(ip.piece));
+            board.set(ip.position, pm.get(ip.piece));
         }
 
         for (String c : tc.upperCaptures) {
-//            upper.capture(c);
         }
-
         for (String c : tc.lowerCaptures) {
-//            lower.capture(c);
         }
 
         for (String s : tc.moves) {
@@ -44,18 +39,6 @@ public class Minishogi {
 
     public boolean isRunning() {
         return gameRunning;
-    }
-
-    private int convert(char c) {
-        if ('1' <= c && c <= '5') {
-            return c - '1';
-        } else if ('a' <= c && c <= 'e') {
-            return c - 'a';
-        } else if ('A' <= c && c <= 'E') {
-            return c - 'E';
-        } else {
-            throw new IllegalArgumentException("invalid position: " + c);
-        }
     }
 
     public void prompt() {
@@ -86,12 +69,36 @@ public class Minishogi {
             }
         }
 
+        private int convert(char c) {
+            if ('1' <= c && c <= '5') {
+                return c - '1';
+            } else if ('a' <= c && c <= 'e') {
+                return c - 'a';
+            } else if ('A' <= c && c <= 'E') {
+                return c - 'E';
+            } else {
+                throw new IllegalArgumentException("invalid position: " + c);
+            }
+        }
+
         public void set(int x, int y, GamePiece v) {
             board[y][x] = v;
         }
 
+        public void set(String pos, GamePiece v) {
+            int x = convert(pos.charAt(1));
+            int y = convert(pos.charAt(0));
+            set(x, y, v);
+        }
+
         public GamePiece get(int x, int y) {
             return board[y][x];
+        }
+
+        public GamePiece get(String pos) {
+            int x = convert(pos.charAt(1));
+            int y = convert(pos.charAt(0));
+            return get(x, y);
         }
 
         public String[][] getBoardData() {
