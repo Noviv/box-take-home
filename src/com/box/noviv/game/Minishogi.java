@@ -13,6 +13,7 @@ public class Minishogi {
     private TestCase tc;
     private Board board = new Board();
     private boolean gameRunning = true;
+    private String errno = "";
 
     private boolean upperTurn = false;
 
@@ -45,7 +46,9 @@ public class Minishogi {
         for (String s : tc.moves) {
             makeMove(s.split(" "));
             if (!isRunning()) {
-                System.err.println("illegal move");
+                if (!tc.moves.isEmpty()) {
+                    System.out.println((upperTurn ? "UPPER" : "lower") + " player action: " + tc.moves.get(tc.moves.size() - 1));
+                }
                 return;
             }
         }
@@ -58,13 +61,21 @@ public class Minishogi {
         return gameRunning;
     }
 
+    public String getErrno() {
+        return errno;
+    }
+
     public void prompt() {
         System.out.println(Utils.stringifyBoard(board.getBoardData()));
         Collectors.joining(",");
-        System.out.println("Captures UPPER: " + upperCaptures.stream().map(Object::toString).collect(Collectors.joining(", ")));
-        System.out.println("Captures lower: " + lowerCaptures.stream().map(Object::toString).collect(Collectors.joining(", ")));
+        System.out.println("Captures UPPER: " + upperCaptures.stream().map(Object::toString).collect(Collectors.joining(" ")));
+        System.out.println("Captures lower: " + lowerCaptures.stream().map(Object::toString).collect(Collectors.joining(" ")));
         System.out.println();
-        System.out.print((upperTurn ? "UPPER" : "lower") + ">");
+        if (gameRunning) {
+            System.out.print((upperTurn ? "UPPER" : "lower") + ">");
+        } else {
+            System.out.println((!upperTurn ? "UPPER" : "lower") + " player wins.  " + getErrno());
+        }
     }
 
     public void makeMove(String... cmd) {
@@ -73,25 +84,25 @@ public class Minishogi {
             GamePiece dst = board.get(cmd[2]);
 
             if (src == null) {
-                System.out.println("INVALID MOVE: no piece at location");
+                errno = "no piece at location";
                 gameRunning = false;
                 return;
             }
 
             if (src.isUpperPiece() != upperTurn) {
-                System.out.println("INVALID MOVE: piece not owned");
+                errno = "piece not owned";
                 gameRunning = false;
                 return;
             }
 
             if (dst != null && dst.isUpperPiece() == upperTurn) {
-                System.out.println("INVALID MOVE: taking piece that is owned");
+                errno = "taking piece that is owned";
                 gameRunning = false;
                 return;
             }
 
             if (!src.validMove(cmd[1], cmd[2], board)) {
-                System.out.println("INVALID MOVE: can't make that move");
+                errno = "Illegal move.";
                 gameRunning = false;
                 return;
             }
