@@ -6,6 +6,8 @@ import com.box.noviv.utils.Utils.*;
 import com.box.noviv.pieces.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class Minishogi {
     private TestCase tc;
@@ -22,6 +24,7 @@ public class Minishogi {
             tc = Utils.parseTestCase(filePath);
         } catch (Exception e) {
             e.printStackTrace();
+            gameRunning = false;
         }
 
         for (InitialPosition ip : tc.initialPieces) {
@@ -30,13 +33,11 @@ public class Minishogi {
 
         for (String c : tc.upperCaptures) {
             if (!c.isEmpty()) {
-                System.out.println("cap: " + c);
                 upperCaptures.add(getPiece(c));
             }
         }
         for (String c : tc.lowerCaptures) {
             if (!c.isEmpty()) {
-                System.out.println("cap: " + c);
                 lowerCaptures.add(getPiece(c));
             }
         }
@@ -44,7 +45,7 @@ public class Minishogi {
         for (String s : tc.moves) {
             makeMove(s.split(" "));
             if (!isRunning()) {
-                System.out.println("illegal move");
+                System.err.println("illegal move");
                 return;
             }
         }
@@ -59,16 +60,15 @@ public class Minishogi {
 
     public void prompt() {
         System.out.println(Utils.stringifyBoard(board.getBoardData()));
-        System.out.println("Captures UPPER: " + (upperCaptures.isEmpty() ? "" : upperCaptures));
-        System.out.println("Captures lower: " + (lowerCaptures.isEmpty() ? "" : lowerCaptures));
+        Collectors.joining(",");
+        System.out.println("Captures UPPER: " + upperCaptures.stream().map(Object::toString).collect(Collectors.joining(", ")));
+        System.out.println("Captures lower: " + lowerCaptures.stream().map(Object::toString).collect(Collectors.joining(", ")));
         System.out.println();
         System.out.print((upperTurn ? "UPPER" : "lower") + ">");
     }
 
     public void makeMove(String... cmd) {
         if (cmd[0].equals("move")) {
-            System.out.println((upperTurn ? "upper" : "lower") + " player action: move");
-
             GamePiece src = board.get(cmd[1]);
             GamePiece dst = board.get(cmd[2]);
 
@@ -203,7 +203,7 @@ public class Minishogi {
                     if (piece != null) {
                         ret[x][y] = piece.getRepr();
                     } else {
-                        ret[x][y] = " ";
+                        ret[x][y] = "__";
                     }
                 }
             }
