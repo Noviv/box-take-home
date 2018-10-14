@@ -1,4 +1,4 @@
-package com.box.noviv;
+package com.box.noviv.utils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

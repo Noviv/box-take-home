@@ -71,25 +71,43 @@ public final class PieceManager {
 
 
     public GamePiece get(String piece) {
+        boolean promote = false;
+        if (piece.charAt(0) == '+') {
+            promote = true;
+            piece = piece.substring(1);
+        }
         String pieceLower = piece.toLowerCase();
         Player p = pieceLower.equals(piece) ? lower : upper;
 
+        GamePiece gp;
+
         switch (pieceLower.charAt(0)) { // DOES NOT HANDLE PROMOTED
             case 'k':
-                return KING(p);
+                gp = KING(p);
+                break;
             case 'r':
-                return ROOK(p);
+                gp = ROOK(p);
+                break;
             case 'b':
-                return BISHOP(p);
+                gp = BISHOP(p);
+                break;
             case 'g':
-                return GGENERAL(p);
+                gp = GGENERAL(p);
+                break;
             case 's':
-                return SGENERAL(p);
+                gp = SGENERAL(p);
+                break;
             case 'p':
-                return PAWN(p);
+                gp = PAWN(p);
+                break;
+            default:
+                throw new IllegalStateException("trying to initialize invalid piece: " + piece);
         }
 
+        if (promote) {
+            gp.promote();
+        }
 
-        return null;
+        return gp;
     }
 }
