@@ -1,0 +1,1 @@
+java -jar out/artifacts/box_take_home_jar/box-take-home.jar

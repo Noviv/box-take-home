@@ -4,13 +4,10 @@ import com.box.noviv.game.Minishogi;
 import com.box.noviv.utils.Coordinate;
 
 public class Pawn extends GamePiece {
-    public Pawn(boolean isUpper) {
-        super(isUpper);
-    }
 
     @Override
-    public void promote() {
-        promoted = true;
+    public void setPromoted(boolean p) {
+        promoted = p;
     }
 
     @Override
@@ -28,18 +25,18 @@ public class Pawn extends GamePiece {
         Coordinate to = b.convert(dst);
 
         if (isPromoted()) {
-            return GoldGeneral.checkValidMove(from, to);
+            return GoldGeneral.checkValidMove(from, to, isUpperPiece());
         } else {
-            return checkValidMove(from, to);
+            return checkValidMove(from, to, isUpperPiece());
         }
     }
 
-    public static boolean checkValidMove(Coordinate from, Coordinate to) {
+    public static boolean checkValidMove(Coordinate from, Coordinate to, boolean upper) {
         if (from.x != to.x) { // cannot move horizontal
             return false;
         }
 
-        if (from.y + 1 != to.y) { // pawn must move vertical
+        if (from.y + (upper ? -1 : 1) != to.y) { // pawn must move vertical
             return false;
         }
 

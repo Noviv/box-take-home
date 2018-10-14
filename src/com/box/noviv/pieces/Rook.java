@@ -4,13 +4,9 @@ import com.box.noviv.game.Minishogi;
 import com.box.noviv.utils.Coordinate;
 
 public class Rook extends GamePiece {
-    public Rook(boolean isUpper) {
-        super(isUpper);
-    }
-
     @Override
-    public void promote() {
-        promoted = true;
+    public void setPromoted(boolean p) {
+        promoted = p;
     }
 
     @Override

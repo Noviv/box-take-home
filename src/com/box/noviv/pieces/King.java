@@ -4,13 +4,11 @@ import com.box.noviv.game.Minishogi;
 import com.box.noviv.utils.Coordinate;
 
 public class King extends GamePiece {
-    public King(boolean isUpper) {
-        super(isUpper);
-    }
-
     @Override
-    public void promote() {
-        throw new IllegalStateException("cannot promote King");
+    public void setPromoted(boolean p) {
+        if (p) {
+            throw new IllegalStateException("cannot setPromoted King");
+        }
     }
 
     @Override

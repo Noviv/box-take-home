@@ -10,7 +10,6 @@ import java.util.ArrayList;
 public class Minishogi {
     private TestCase tc;
     private Board board = new Board();
-    private PieceManager pm = new PieceManager();
     private boolean gameRunning = true;
 
     private boolean upperTurn = false;
@@ -26,28 +25,31 @@ public class Minishogi {
         }
 
         for (InitialPosition ip : tc.initialPieces) {
-            board.set(ip.position, pm.get(ip.piece));
+            board.set(ip.position, getPiece(ip.piece));
         }
 
         for (String c : tc.upperCaptures) {
             if (!c.isEmpty()) {
                 System.out.println("cap: " + c);
-                upperCaptures.add(pm.get(c));
+                upperCaptures.add(getPiece(c));
             }
         }
         for (String c : tc.lowerCaptures) {
             if (!c.isEmpty()) {
                 System.out.println("cap: " + c);
-                lowerCaptures.add(pm.get(c));
+                lowerCaptures.add(getPiece(c));
             }
         }
 
         for (String s : tc.moves) {
-            makeMove(s);
+            makeMove(s.split(" "));
             if (!isRunning()) {
                 System.out.println("illegal move");
                 return;
             }
+        }
+        if (!tc.moves.isEmpty()) {
+            System.out.println((!upperTurn ? "UPPER" : "lower") + " player action: " + tc.moves.get(tc.moves.size() - 1));
         }
     }
 
@@ -57,8 +59,8 @@ public class Minishogi {
 
     public void prompt() {
         System.out.println(Utils.stringifyBoard(board.getBoardData()));
-        System.out.println("Captures UPPER: " + upperCaptures);
-        System.out.println("Captures lower: " + lowerCaptures);
+        System.out.println("Captures UPPER: " + (upperCaptures.isEmpty() ? "" : upperCaptures));
+        System.out.println("Captures lower: " + (lowerCaptures.isEmpty() ? "" : lowerCaptures));
         System.out.println();
         System.out.print((upperTurn ? "UPPER" : "lower") + ">");
     }
@@ -70,14 +72,14 @@ public class Minishogi {
             GamePiece src = board.get(cmd[1]);
             GamePiece dst = board.get(cmd[2]);
 
-            if (src.isUpperPiece() != upperTurn) {
-                System.out.println("INVALID MOVE: piece not owned");
+            if (src == null) {
+                System.out.println("INVALID MOVE: no piece at location");
                 gameRunning = false;
                 return;
             }
 
-            if (!src.validMove(cmd[1], cmd[2], board)) {
-                System.out.println("INVALID MOVE: can't make that move");
+            if (src.isUpperPiece() != upperTurn) {
+                System.out.println("INVALID MOVE: piece not owned");
                 gameRunning = false;
                 return;
             }
@@ -88,11 +90,56 @@ public class Minishogi {
                 return;
             }
 
+            if (!src.validMove(cmd[1], cmd[2], board)) {
+                System.out.println("INVALID MOVE: can't make that move");
+                gameRunning = false;
+                return;
+            }
+
             board.set(cmd[2], src);
             board.set(cmd[1], null);
         }
 
         upperTurn = !upperTurn;
+    }
+
+
+    private GamePiece getPiece(String piece) {
+        boolean promote = piece.charAt(0) == '+';
+        if (promote) {
+            piece = piece.substring(1);
+        }
+        String pieceLower = piece.toLowerCase();
+
+        GamePiece gp;
+
+        switch (pieceLower.charAt(0)) {
+            case 'k':
+                gp = new King();
+                break;
+            case 'r':
+                gp = new Rook();
+                break;
+            case 'b':
+                gp = new Bishop();
+                break;
+            case 'g':
+                gp = new GoldGeneral();
+                break;
+            case 's':
+                gp = new SilverGeneral();
+                break;
+            case 'p':
+                gp = new Pawn();
+                break;
+            default:
+                throw new IllegalStateException("trying to initialize invalid piece: " + piece);
+        }
+
+        gp.setPromoted(promote);
+        gp.setUpperPiece(!pieceLower.equals(piece));
+
+        return gp;
     }
 
     public class Board {
