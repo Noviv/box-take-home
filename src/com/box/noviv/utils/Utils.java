@@ -7,6 +7,64 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Utils {
+    public static String stringifyBoard(String[][] board) {
+
+        String str = "";
+
+        for (int row = board.length - 1; row >= 0; row--) {
+
+            str += Integer.toString(row + 1) + " |";
+            for (int col = 0; col < board[row].length; col++) {
+                str += stringifySquare(board[col][row]);
+            }
+            str += System.getProperty("line.separator");
+        }
+
+        str += "    a  b  c  d  e" + System.getProperty("line.separator");
+
+        return str;
+    }
+
+    private static String stringifySquare(String sq) {
+
+        switch (sq.length()) {
+            case 0:
+                return "__|";
+            case 1:
+                return " " + sq + "|";
+            case 2:
+                return sq + "|";
+        }
+
+        throw new IllegalArgumentException("Board must be an array of strings like \"\", \"P\", or \"+P\"");
+    }
+
+    public static TestCase parseTestCase(String path) throws Exception {
+        BufferedReader br = new BufferedReader(new FileReader(path));
+        String line = br.readLine().trim();
+        List<InitialPosition> initialPieces = new ArrayList<InitialPosition>();
+        while (!line.equals("")) {
+            String[] lineParts = line.split(" ");
+            initialPieces.add(new InitialPosition(lineParts[0], lineParts[1]));
+            line = br.readLine().trim();
+        }
+        line = br.readLine().trim();
+        List<String> upperCaptures = Arrays.asList(line.substring(1, line.length() - 1).split(" "));
+        line = br.readLine().trim();
+        List<String> lowerCaptures = Arrays.asList(line.substring(1, line.length() - 1).split(" "));
+        line = br.readLine();
+        List<String> moves = new ArrayList<>();
+        while (line != null) {
+            line = line.trim();
+            if (!line.isEmpty()) {
+                moves.add(line);
+            }
+            line = br.readLine();
+        }
+
+        return new TestCase(initialPieces, upperCaptures, lowerCaptures, moves);
+    }
+
     public static class InitialPosition {
         public String piece;
         public String position;
@@ -64,63 +122,5 @@ public class Utils {
 
             return str;
         }
-    }
-
-    public static String stringifyBoard(String[][] board) {
-
-        String str = "";
-
-        for (int row = board.length - 1; row >= 0; row--) {
-
-            str += Integer.toString(row + 1) + " |";
-            for (int col = 0; col < board[row].length; col++) {
-                str += stringifySquare(board[col][row]);
-            }
-            str += System.getProperty("line.separator");
-        }
-
-        str += "    a  b  c  d  e" + System.getProperty("line.separator");
-
-        return str;
-    }
-
-    private static String stringifySquare(String sq) {
-
-        switch (sq.length()) {
-            case 0:
-                return "__|";
-            case 1:
-                return " " + sq + "|";
-            case 2:
-                return sq + "|";
-        }
-
-        throw new IllegalArgumentException("Board must be an array of strings like \"\", \"P\", or \"+P\"");
-    }
-
-    public static TestCase parseTestCase(String path) throws Exception {
-        BufferedReader br = new BufferedReader(new FileReader(path));
-        String line = br.readLine().trim();
-        List<InitialPosition> initialPieces = new ArrayList<InitialPosition>();
-        while (!line.equals("")) {
-            String[] lineParts = line.split(" ");
-            initialPieces.add(new InitialPosition(lineParts[0], lineParts[1]));
-            line = br.readLine().trim();
-        }
-        line = br.readLine().trim();
-        List<String> upperCaptures = Arrays.asList(line.substring(1, line.length() - 1).split(" "));
-        line = br.readLine().trim();
-        List<String> lowerCaptures = Arrays.asList(line.substring(1, line.length() - 1).split(" "));
-        line = br.readLine();
-        List<String> moves = new ArrayList<>();
-        while (line != null) {
-            line = line.trim();
-            if (!line.isEmpty()) {
-                moves.add(line);
-            }
-            line = br.readLine();
-        }
-
-        return new TestCase(initialPieces, upperCaptures, lowerCaptures, moves);
     }
 }

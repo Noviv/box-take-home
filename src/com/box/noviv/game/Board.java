@@ -69,7 +69,7 @@ public class Board {
 
     /**
      * @param pos String containing coordinate for insertion.
-     * @param v GamePiece to insert.
+     * @param v   GamePiece to insert.
      */
     public void set(String pos, GamePiece v) {
         set(convert(pos), v);

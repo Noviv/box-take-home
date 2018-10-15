@@ -136,24 +136,6 @@ public class Minishogi {
             GamePiece src = board.get(cmd[1]);
             GamePiece dst = board.get(cmd[2]);
 
-            if (src == null) {
-                errno = "no piece at location";
-                gameRunning = false;
-                return;
-            }
-
-            if (src.isUpperPiece() != upperTurn) {
-                errno = "piece not owned";
-                gameRunning = false;
-                return;
-            }
-
-            if (dst != null && dst.isUpperPiece() == upperTurn) {
-                errno = "taking piece that is owned";
-                gameRunning = false;
-                return;
-            }
-
             if (!src.validMove(cmd[1], cmd[2], board)) {
                 errno = "Illegal move.";
                 gameRunning = false;
@@ -207,15 +189,16 @@ public class Minishogi {
             board.set(cmd[2], src);
             board.set(cmd[1], null);
         } else if (cmd[0].equals("drop")) {
+            if (board.get(cmd[2]) != null) {
+                errno = "Illegal move.";
+                gameRunning = false;
+                return;
+            }
+
             boolean found = false;
             for (int i = 0; !found && i < (upperTurn ? upperCaptures : lowerCaptures).size(); i++) {
                 if ((upperTurn ? upperCaptures : lowerCaptures).get(i).getRepr().toLowerCase().contains(cmd[1])) {
-                    if (board.get(cmd[2]) != null) {
-                        errno = "Illegal move.";
-                        gameRunning = false;
-                        return;
-                    }
-
+                    // can't have two same-side pawns in the same columns
                     Coordinate place = board.convert(cmd[2]);
                     if ((upperTurn ? upperCaptures : lowerCaptures).get(i) instanceof Pawn) {
                         for (int r = 0; r < 5; r++) {
@@ -229,8 +212,10 @@ public class Minishogi {
                             }
                         }
                     }
+
                     GamePiece gp = (upperTurn ? upperCaptures : lowerCaptures).get(i);
                     if (gp instanceof Pawn) {
+                        // can't place pawn in promotion zone opposite side
                         if ((gp.isUpperPiece() && place.vert == 0) ||
                                 (!gp.isUpperPiece() && place.vert == 4)) {
                             errno = "Illegal move.";
@@ -255,7 +240,7 @@ public class Minishogi {
                     found = true;
                 }
             }
-            if (!found) {
+            if (!found) { // could not find piece to drop
                 errno = "Illegal move.";
                 gameRunning = false;
                 return;

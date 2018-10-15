@@ -4,6 +4,21 @@ import com.box.noviv.game.Board;
 import com.box.noviv.utils.Coordinate;
 
 public class SilverGeneral extends GamePiece {
+    public static boolean checkValidMove(Coordinate from, Coordinate to, Board b, boolean upper) {
+        if (b.get(to) != null && b.get(to).isUpperPiece() == upper) {
+            return false;
+        }
+
+        int dy = to.vert - from.vert;
+        if (dy == (upper ? -1 : 1)) {
+            return Math.abs(to.horiz - from.horiz) <= 1;
+        } else if (dy == (upper ? 1 : -1)) {
+            return Math.abs(to.horiz - from.horiz) == 1;
+        }
+
+        return false;
+    }
+
     @Override
     public void setPromoted(boolean p) {
         promoted = p;
@@ -28,20 +43,5 @@ public class SilverGeneral extends GamePiece {
         } else {
             return checkValidMove(from, to, b, isUpperPiece());
         }
-    }
-
-    public static boolean checkValidMove(Coordinate from, Coordinate to, Board b, boolean upper) {
-        if (b.get(to) != null && b.get(to).isUpperPiece() == upper) {
-            return false;
-        }
-
-        int dy = to.vert - from.vert;
-        if (dy == (upper ? -1 : 1)) {
-            return Math.abs(to.horiz - from.horiz) <= 1;
-        } else if (dy == (upper ? 1 : -1)) {
-            return Math.abs(to.horiz - from.horiz) == 1;
-        }
-
-        return false;
     }
 }
