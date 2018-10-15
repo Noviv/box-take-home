@@ -30,7 +30,7 @@ public class GoldGeneral extends GamePiece {
         } else if (dy == 0) {
             return Math.abs(to.x - from.x) == 1;
         } else if (dy == (upper ? 1 : -1)) {
-            return to.x == from.x - 1;
+            return to.x == from.x;
         }
 
         return false;

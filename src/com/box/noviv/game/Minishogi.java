@@ -1,12 +1,12 @@
 package com.box.noviv.game;
 
+import com.box.noviv.pieces.*;
 import com.box.noviv.utils.Coordinate;
 import com.box.noviv.utils.Utils;
-import com.box.noviv.utils.Utils.*;
-import com.box.noviv.pieces.*;
+import com.box.noviv.utils.Utils.InitialPosition;
+import com.box.noviv.utils.Utils.TestCase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class Minishogi {
@@ -19,6 +19,8 @@ public class Minishogi {
 
     private ArrayList<GamePiece> upperCaptures = new ArrayList<>();
     private ArrayList<GamePiece> lowerCaptures = new ArrayList<>();
+
+    private int turnCount = 0;
 
     public Minishogi(String filePath) {
         try {
@@ -74,11 +76,17 @@ public class Minishogi {
         if (gameRunning) {
             System.out.print((upperTurn ? "UPPER" : "lower") + ">");
         } else {
-            System.out.println((!upperTurn ? "UPPER" : "lower") + " player wins.  " + getErrno());
+            if (turnCount >= 200) {
+                System.out.println("Tie game.  " + getErrno());
+            } else {
+                System.out.println((!upperTurn ? "UPPER" : "lower") + " player wins.  " + getErrno());
+            }
         }
     }
 
     public void makeMove(String... cmd) {
+        assert cmd.length > 2 : "invalid number of commands";
+
         if (cmd[0].equals("move")) {
             GamePiece src = board.get(cmd[1]);
             GamePiece dst = board.get(cmd[2]);
@@ -107,11 +115,77 @@ public class Minishogi {
                 return;
             }
 
+            if (cmd.length > 3 && cmd[3].equals("promote")) {
+                if (src.isPromoted()) {
+                    errno = "Illegal move.";
+                    gameRunning = false;
+                    return;
+                }
+                src.setPromoted(true);
+            }
+
+            if (src instanceof Pawn) {
+                Coordinate c = board.convert(cmd[2]);
+                if (c.y == 0 || c.y == 4) {
+                    src.setPromoted(true);
+                }
+            }
+
+            // modification
+            if (dst != null) {
+                dst.setUpperPiece(!dst.isUpperPiece());
+                dst.setPromoted(false);
+                if (upperTurn) {
+                    upperCaptures.add(dst);
+                } else {
+                    lowerCaptures.add(dst);
+                }
+            }
+
             board.set(cmd[2], src);
             board.set(cmd[1], null);
+        } else if (cmd[0].equals("drop")) {
+            boolean found = false;
+            for (int i = 0; !found && i < (upperTurn ? upperCaptures : lowerCaptures).size(); i++) {
+                if ((upperTurn ? upperCaptures : lowerCaptures).get(i).getRepr().toLowerCase().contains(cmd[1])) {
+                    if (board.get(cmd[2]) != null) {
+                        errno = "Illegal move.";
+                        gameRunning = false;
+                        return;
+                    }
+
+                    if ((upperTurn ? upperCaptures : lowerCaptures).get(i) instanceof Pawn) {
+                        Coordinate c = board.convert(cmd[2]);
+                        for (int r = 0; r < 5; r++) {
+                            if (r != c.y) {
+                                GamePiece gp = board.get(c.x, r);
+                                if (gp != null && gp instanceof Pawn && gp.isUpperPiece() == (upperTurn ? upperCaptures : lowerCaptures).get(i).isUpperPiece()) {
+                                    errno = "Illegal move.";
+                                    gameRunning = false;
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    board.set(cmd[2], (upperTurn ? upperCaptures : lowerCaptures).remove(i));
+                    found = true;
+                }
+            }
+            if (!found) {
+                errno = "Illegal move.";
+                gameRunning = false;
+                return;
+            }
         }
 
+        turnCount++;
         upperTurn = !upperTurn;
+
+        if (turnCount >= 200) {
+            gameRunning = false;
+            errno = "Too many moves.";
+            upperTurn = !upperTurn;
+        }
     }
 
 

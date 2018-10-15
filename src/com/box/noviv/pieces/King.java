@@ -27,6 +27,6 @@ public class King extends GamePiece {
         int dx = Math.abs(to.x - from.x);
         int dy = Math.abs(to.y - from.y);
 
-        return dx == 1 && dy == 1;
+        return dx == 1 || dy == 1;
     }
 }
