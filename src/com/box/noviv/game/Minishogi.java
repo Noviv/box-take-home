@@ -219,8 +219,21 @@ public class Minishogi {
                             gameRunning = false;
                             return;
                         }
+
+                        // check that pawn isn't checkmating
+                        GamePiece tmp = board.get(cmd[2]);
+                        board.set(cmd[2], gp);
+                        ArrayList<String> uncheckMoves = board.getCheckStatus(!upperTurn);
+                        if (uncheckMoves != null && uncheckMoves.isEmpty()) {
+                            board.set(cmd[2], tmp);
+                            errno = "Illegal move.";
+                            gameRunning = false;
+                            return;
+                        }
                     }
-                    board.set(cmd[2], (upperTurn ? upperCaptures : lowerCaptures).remove(i));
+
+                    board.set(cmd[2], gp);
+                    (upperTurn ? upperCaptures : lowerCaptures).remove(i);
                     found = true;
                 }
             }

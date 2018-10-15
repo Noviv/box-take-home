@@ -33,7 +33,7 @@ public class Rook extends GamePiece {
     }
 
     public static boolean checkValidMove(Coordinate from, Coordinate to, Board b, boolean upper) {
-        if (b.get(to) != null && b.get(to).isUpperPiece() != upper) {
+        if (b.get(to) != null && b.get(to).isUpperPiece() == upper) {
             return false;
         }
 
@@ -50,15 +50,12 @@ public class Rook extends GamePiece {
 
         d += dofs;
 
-        System.err.println(from + " -> " + to);
         while (d != 0) {
             if (vertical) {
-                System.err.println("trying " + from.horiz + ", " + (from.vert + d));
                 if (b.get(from.horiz, from.vert + d) != null) {
                     return false;
                 }
             } else {
-                System.err.println("trying " + (from.horiz + d) + ", " + from.vert);
                 if (b.get(from.horiz + d, from.vert) != null) {
                     return false;
                 }

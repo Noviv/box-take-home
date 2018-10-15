@@ -33,32 +33,69 @@ public class Bishop extends GamePiece {
     }
 
     public static boolean checkValidMove(Coordinate from, Coordinate to, Board b, boolean upper) {
-        if (b.get(to) != null && b.get(to).isUpperPiece() != upper) {
+        if (b.get(to) != null && b.get(to).isUpperPiece() == upper) {
             return false;
         }
 
-        int dx = to.horiz - from.horiz;
-        int dy = to.vert - from.vert;
+        int dx = Math.abs(from.horiz - to.horiz);
+        int dy = Math.abs(from.vert - to.vert);
 
-        if (Math.abs(dx) != Math.abs(dy)) {
+        if (dx != dy || dx == 0) {
             return false;
         }
 
-        int dxofs = dx > 0 ? -1 : 1;
-        int dyofs = dy > 0 ? -1 : 1;
+        int x = from.horiz;
+        int y = from.vert;
 
-        dx += dxofs;
-        dy += dyofs;
+        if (to.horiz > from.horiz) {
+            x++;
+        } else {
+            x--;
+        }
+        if (to.vert > from.vert) {
+            y++;
+        } else {
+            y--;
+        }
 
-        while (dx != 0 && dy != 0) {
-            if (b.get(from.horiz + dx, from.vert + dy) != null) {
+        while (x != to.horiz && y != to.vert) {
+            if (b.get(x, y) != null) {
                 return false;
             }
-
-            dx += dxofs;
-            dy += dyofs;
+            if (to.horiz > from.horiz) {
+                x++;
+            } else {
+                x--;
+            }
+            if (to.vert > from.vert) {
+                y++;
+            } else {
+                y--;
+            }
         }
 
         return true;
+
+//        if (Math.abs(dx) != Math.abs(dy)) {
+//            return false;
+//        }
+//
+//        int dxofs = dx > 0 ? -1 : 1;
+//        int dyofs = dy > 0 ? -1 : 1;
+//
+//        dx += dxofs;
+//        dy += dyofs;
+//
+//        while (dx != 0 && dy != 0) {
+//            System.err.println("trying " + (from.horiz + dx) + ", " + (from.vert + dy));
+//            if (b.get(from.horiz + dx, from.vert + dy) != null) {
+//                return false;
+//            }
+//
+//            dx += dxofs;
+//            dy += dyofs;
+//        }
+//
+//        return true;
     }
 }

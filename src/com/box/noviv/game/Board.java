@@ -4,6 +4,7 @@ import com.box.noviv.pieces.GamePiece;
 import com.box.noviv.pieces.King;
 import com.box.noviv.utils.Coordinate;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -100,6 +101,7 @@ public class Board {
         boolean inCheck = false;
 
         ArrayList<String> moves = new ArrayList<>();
+
         for (int r = -1; r <= 1; r++) {
             for (int c = -1; c <= 1; c++) {
                 Coordinate newC = new Coordinate(kingC.horiz + r, kingC.vert + c);
@@ -109,8 +111,8 @@ public class Board {
 
                 GamePiece gp = get(newC);
                 boolean unblocked = true;
+                GamePiece king = get(kingC);
                 for (int i = 0; unblocked && i < attackers.size(); i++) {
-                    GamePiece king = get(kingC);
                     GamePiece prev = get(newC);
                     set(newC, king);
                     set(kingC, null);
@@ -118,7 +120,9 @@ public class Board {
                         if (r == 0 && c == 0) {
                             inCheck = true;
                         }
-                        unblocked = false;
+                        if (prev == null || !prev.getRepr().equals(attackers.get(i).getRepr())) {
+                            unblocked = false;
+                        }
                     }
                     set(newC, prev);
                     set(kingC, king);
