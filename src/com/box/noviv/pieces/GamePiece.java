@@ -1,6 +1,6 @@
 package com.box.noviv.pieces;
 
-import com.box.noviv.game.Minishogi;
+import com.box.noviv.game.Board;
 
 public abstract class GamePiece {
     private boolean upper;
@@ -22,7 +22,7 @@ public abstract class GamePiece {
 
     public abstract String getRepr();
 
-    public abstract boolean validMove(String src, String dst, Minishogi.Board b);
+    public abstract boolean validMove(String src, String dst, Board b);
 
     @Override
     public String toString() {

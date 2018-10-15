@@ -20,7 +20,8 @@ public class Minishogi {
     private ArrayList<GamePiece> upperCaptures = new ArrayList<>();
     private ArrayList<GamePiece> lowerCaptures = new ArrayList<>();
 
-    private int turnCount = 0;
+    private int uTurnCount = 0;
+    private int lTurnCount = 0;
 
     public Minishogi(String filePath) {
         try {
@@ -73,10 +74,13 @@ public class Minishogi {
         System.out.println("Captures UPPER: " + upperCaptures.stream().map(Object::toString).collect(Collectors.joining(" ")));
         System.out.println("Captures lower: " + lowerCaptures.stream().map(Object::toString).collect(Collectors.joining(" ")));
         System.out.println();
+
+        board.printCheckStatus(upperTurn);
+
         if (gameRunning) {
             System.out.print((upperTurn ? "UPPER" : "lower") + ">");
         } else {
-            if (turnCount >= 200) {
+            if (uTurnCount >= 200 && lTurnCount >= 200) {
                 System.out.println("Tie game.  " + getErrno());
             } else {
                 System.out.println((!upperTurn ? "UPPER" : "lower") + " player wins.  " + getErrno());
@@ -121,6 +125,11 @@ public class Minishogi {
                     gameRunning = false;
                     return;
                 }
+                if (src instanceof King || src instanceof GoldGeneral) {
+                    errno = "Illegal move.";
+                    gameRunning = false;
+                    return;
+                }
                 src.setPromoted(true);
             }
 
@@ -154,17 +163,26 @@ public class Minishogi {
                         return;
                     }
 
+                    Coordinate place = board.convert(cmd[2]);
                     if ((upperTurn ? upperCaptures : lowerCaptures).get(i) instanceof Pawn) {
-                        Coordinate c = board.convert(cmd[2]);
                         for (int r = 0; r < 5; r++) {
-                            if (r != c.y) {
-                                GamePiece gp = board.get(c.x, r);
+                            if (r != place.y) {
+                                GamePiece gp = board.get(place.x, r);
                                 if (gp != null && gp instanceof Pawn && gp.isUpperPiece() == (upperTurn ? upperCaptures : lowerCaptures).get(i).isUpperPiece()) {
                                     errno = "Illegal move.";
                                     gameRunning = false;
                                     return;
                                 }
                             }
+                        }
+                    }
+                    GamePiece gp = (upperTurn ? upperCaptures : lowerCaptures).get(i);
+                    if (gp instanceof Pawn) {
+                        if ((gp.isUpperPiece() && place.y == 0) ||
+                                (!gp.isUpperPiece() && place.y == 4)) {
+                            errno = "Illegal move.";
+                            gameRunning = false;
+                            return;
                         }
                     }
                     board.set(cmd[2], (upperTurn ? upperCaptures : lowerCaptures).remove(i));
@@ -178,14 +196,19 @@ public class Minishogi {
             }
         }
 
-        turnCount++;
-        upperTurn = !upperTurn;
+        if (upperTurn) {
+            uTurnCount++;
+        } else {
+            lTurnCount++;
+        }
 
-        if (turnCount >= 200) {
+        if (uTurnCount >= 200 && lTurnCount >= 200) {
             gameRunning = false;
             errno = "Too many moves.";
-            upperTurn = !upperTurn;
+            return;
         }
+
+        upperTurn = !upperTurn;
     }
 
 
@@ -225,75 +248,5 @@ public class Minishogi {
         gp.setUpperPiece(!pieceLower.equals(piece));
 
         return gp;
-    }
-
-    public class Board {
-        private GamePiece[][] board;
-
-        public Board() {
-            board = new GamePiece[5][5];
-            for (char x = 0; x < 5; x++) {
-                for (char y = 0; y < 5; y++) {
-                    set(x, y, null);
-                }
-            }
-        }
-
-        private int convert(char c) {
-            if ('1' <= c && c <= '5') {
-                return c - '1';
-            } else if ('a' <= c && c <= 'e') {
-                return c - 'a';
-            } else if ('A' <= c && c <= 'E') {
-                return c - 'E';
-            } else {
-                throw new IllegalArgumentException("invalid position: " + c);
-            }
-        }
-
-        public Coordinate convert(String pos) {
-            return new Coordinate(convert(pos.charAt(0)), convert(pos.charAt(1)));
-        }
-
-        public void set(int x, int y, GamePiece v) {
-            board[y][x] = v;
-        }
-
-        public void set(Coordinate c, GamePiece v) {
-            board[c.y][c.x] = v;
-        }
-
-        public void set(String pos, GamePiece v) {
-            set(convert(pos), v);
-        }
-
-        public GamePiece get(int x, int y) {
-            return board[y][x];
-        }
-
-        public GamePiece get(Coordinate c) {
-            return board[c.y][c.x];
-        }
-
-        public GamePiece get(String pos) {
-            return get(convert(pos));
-        }
-
-        public String[][] getBoardData() {
-            String[][] ret = new String[5][5];
-
-            for (int x = 0; x < 5; x++) {
-                for (int y = 0; y < 5; y++) {
-                    GamePiece piece = get(x, y);
-                    if (piece != null) {
-                        ret[x][y] = piece.getRepr();
-                    } else {
-                        ret[x][y] = "__";
-                    }
-                }
-            }
-
-            return ret;
-        }
     }
 }
