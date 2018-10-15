@@ -24,23 +24,48 @@ public class Rook extends GamePiece {
         Coordinate to = b.convert(dst);
 
         if (isPromoted()) {
-            if (King.checkValidMove(from, to)) {
+            if (King.checkValidMove(from, to, b, isUpperPiece())) {
                 return true;
             }
         }
 
-        return checkValidMove(from, to);
+        return checkValidMove(from, to, b, isUpperPiece());
     }
 
-    public static boolean checkValidMove(Coordinate from, Coordinate to) {
-        if (to.x != from.x) {
-            return to.y == from.y;
+    public static boolean checkValidMove(Coordinate from, Coordinate to, Board b, boolean upper) {
+        if (b.get(to) != null && b.get(to).isUpperPiece() != upper) {
+            return false;
         }
 
-        if (to.y != from.y) {
-            return to.x == from.x;
+        if (to.vert != from.vert && to.horiz != from.horiz) {
+            return false;
+        } else if (to.vert == from.vert && to.horiz == from.horiz) {
+            return false;
         }
 
-        return false;
+        boolean vertical = to.vert != from.vert;
+        int d = vertical ? to.vert - from.vert : to.horiz - from.horiz;
+
+        int dofs = d > 0 ? -1 : 1;
+
+        d += dofs;
+
+        System.err.println(from + " -> " + to);
+        while (d != 0) {
+            if (vertical) {
+                System.err.println("trying " + from.horiz + ", " + (from.vert + d));
+                if (b.get(from.horiz, from.vert + d) != null) {
+                    return false;
+                }
+            } else {
+                System.err.println("trying " + (from.horiz + d) + ", " + from.vert);
+                if (b.get(from.horiz + d, from.vert) != null) {
+                    return false;
+                }
+            }
+            d += dofs;
+        }
+
+        return true;
     }
 }

@@ -25,18 +25,22 @@ public class Pawn extends GamePiece {
         Coordinate to = b.convert(dst);
 
         if (isPromoted()) {
-            return GoldGeneral.checkValidMove(from, to, isUpperPiece());
+            return GoldGeneral.checkValidMove(from, to, b, isUpperPiece());
         } else {
-            return checkValidMove(from, to, isUpperPiece());
+            return checkValidMove(from, to, b, isUpperPiece());
         }
     }
 
-    public static boolean checkValidMove(Coordinate from, Coordinate to, boolean upper) {
-        if (from.x != to.x) { // cannot move horizontal
+    public static boolean checkValidMove(Coordinate from, Coordinate to, Board b, boolean upper) {
+        if (b.get(to) != null && b.get(to).isUpperPiece() == upper) {
             return false;
         }
 
-        if (from.y + (upper ? -1 : 1) != to.y) { // pawn must move vertical
+        if (from.horiz != to.horiz) { // cannot move horizontal
+            return false;
+        }
+
+        if (from.vert + (upper ? -1 : 1) != to.vert) { // pawn must move vertical
             return false;
         }
 

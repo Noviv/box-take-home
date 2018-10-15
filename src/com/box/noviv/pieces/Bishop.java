@@ -24,17 +24,21 @@ public class Bishop extends GamePiece {
         Coordinate to = b.convert(dst);
 
         if (isPromoted()) {
-            if (King.checkValidMove(from, to)) {
+            if (King.checkValidMove(from, to, b, isUpperPiece())) {
                 return true;
             }
         }
 
-        return checkValidMove(from, to, b);
+        return checkValidMove(from, to, b, isUpperPiece());
     }
 
-    public static boolean checkValidMove(Coordinate from, Coordinate to, Board b) {
-        int dx = to.x - from.x;
-        int dy = to.y - from.y;
+    public static boolean checkValidMove(Coordinate from, Coordinate to, Board b, boolean upper) {
+        if (b.get(to) != null && b.get(to).isUpperPiece() != upper) {
+            return false;
+        }
+
+        int dx = to.horiz - from.horiz;
+        int dy = to.vert - from.vert;
 
         if (Math.abs(dx) != Math.abs(dy)) {
             return false;
@@ -46,8 +50,8 @@ public class Bishop extends GamePiece {
         dx += dxofs;
         dy += dyofs;
 
-        while (Math.abs(dx) != 1 && Math.abs(dy) != 1) {
-            if (b.get(from.x + dx, from.y + dy) != null) {
+        while (dx != 0 && dy != 0) {
+            if (b.get(from.horiz + dx, from.vert + dy) != null) {
                 return false;
             }
 

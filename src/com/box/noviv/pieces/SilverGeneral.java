@@ -24,18 +24,22 @@ public class SilverGeneral extends GamePiece {
         Coordinate to = b.convert(dst);
 
         if (isPromoted()) {
-            return GoldGeneral.checkValidMove(from, to, isUpperPiece());
+            return GoldGeneral.checkValidMove(from, to, b, isUpperPiece());
         } else {
-            return checkValidMove(from, to, isUpperPiece());
+            return checkValidMove(from, to, b, isUpperPiece());
         }
     }
 
-    public static boolean checkValidMove(Coordinate from, Coordinate to, boolean upper) {
-        int dy = to.y - from.y;
+    public static boolean checkValidMove(Coordinate from, Coordinate to, Board b, boolean upper) {
+        if (b.get(to) != null && b.get(to).isUpperPiece() == upper) {
+            return false;
+        }
+
+        int dy = to.vert - from.vert;
         if (dy == (upper ? -1 : 1)) {
-            return Math.abs(to.x - from.x) <= 1;
+            return Math.abs(to.horiz - from.horiz) <= 1;
         } else if (dy == (upper ? 1 : -1)) {
-            return Math.abs(to.x - from.x) == 1;
+            return Math.abs(to.horiz - from.horiz) == 1;
         }
 
         return false;

@@ -41,7 +41,7 @@ public class Board {
     }
 
     public void set(Coordinate c, GamePiece v) {
-        board[c.y][c.x] = v;
+        board[c.vert][c.horiz] = v;
     }
 
     public void set(String pos, GamePiece v) {
@@ -53,7 +53,7 @@ public class Board {
     }
 
     public GamePiece get(Coordinate c) {
-        return board[c.y][c.x];
+        return board[c.vert][c.horiz];
     }
 
     public GamePiece get(String pos) {
@@ -77,7 +77,7 @@ public class Board {
         return ret;
     }
 
-    public void printCheckStatus(boolean upper) {
+    public ArrayList<String> getCheckStatus(boolean upper) {
         ArrayList<GamePiece> attackers = new ArrayList<>();
         ArrayList<Coordinate> attackersC = new ArrayList<>();
         Coordinate kingC = null;
@@ -102,23 +102,28 @@ public class Board {
         ArrayList<String> moves = new ArrayList<>();
         for (int r = -1; r <= 1; r++) {
             for (int c = -1; c <= 1; c++) {
-                Coordinate newC = new Coordinate(kingC.x + r, kingC.y + c);
-                if (newC.x < 0 || newC.x > 4 || newC.y < 0 || newC.y > 4) {
+                Coordinate newC = new Coordinate(kingC.horiz + r, kingC.vert + c);
+                if (newC.horiz < 0 || newC.horiz > 4 || newC.vert < 0 || newC.vert > 4) {
                     continue;
                 }
 
                 GamePiece gp = get(newC);
                 boolean unblocked = true;
-                for (int i = 0; i < attackers.size(); i++) {
+                for (int i = 0; unblocked && i < attackers.size(); i++) {
+                    GamePiece king = get(kingC);
+                    GamePiece prev = get(newC);
+                    set(newC, king);
+                    set(kingC, null);
                     if (attackers.get(i).validMove(attackersC.get(i).getRepr(), newC.getRepr(), this)) {
                         if (r == 0 && c == 0) {
                             inCheck = true;
-                            System.out.println(attackers.get(i) + " can hit from " + attackersC.get(i).getRepr() + " to " + newC.getRepr());
                         }
                         unblocked = false;
                     }
+                    set(newC, prev);
+                    set(kingC, king);
                 }
-                if (gp != null && r != 0 && c != 0 && gp.isUpperPiece() == upper) {
+                if (gp != null && (r != 0 || c != 0) && gp.isUpperPiece() == upper) {
                     unblocked = false;
                 }
                 if (unblocked) {
@@ -129,11 +134,9 @@ public class Board {
 
         if (inCheck) {
             Collections.sort(moves);
-            System.out.println((upper ? "UPPER" : "lower") + " player is in check!");
-            System.out.println("Available moves:");
-            for (String move : moves) {
-                System.out.println(move);
-            }
+            return moves;
+        } else {
+            return null;
         }
     }
 }

@@ -20,12 +20,16 @@ public class King extends GamePiece {
     public boolean validMove(String src, String dst, Board b) {
         Coordinate from = b.convert(src);
         Coordinate to = b.convert(dst);
-        return checkValidMove(from, to);
+        return checkValidMove(from, to, b, isUpperPiece());
     }
 
-    public static boolean checkValidMove(Coordinate from, Coordinate to) {
-        int dx = Math.abs(to.x - from.x);
-        int dy = Math.abs(to.y - from.y);
+    public static boolean checkValidMove(Coordinate from, Coordinate to, Board b, boolean upper) {
+        if (b.get(to) != null && b.get(to).isUpperPiece() == upper) {
+            return false;
+        }
+
+        int dx = Math.abs(to.horiz - from.horiz);
+        int dy = Math.abs(to.vert - from.vert);
 
         return dx <= 1 && dy <= 1;
     }

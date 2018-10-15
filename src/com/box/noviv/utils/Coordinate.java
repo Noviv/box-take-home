@@ -1,21 +1,21 @@
 package com.box.noviv.utils;
 
 public final class Coordinate {
-    public final int x;
-    public final int y;
+    public final int horiz;
+    public final int vert;
 
     public Coordinate(int _x, int _y) {
-        x = _x;
-        y = _y;
+        horiz = _x;
+        vert = _y;
     }
 
     public String getRepr() {
-        return revert(y, true) + "" + revert(x, false);
+        return revert(horiz, true) + "" + revert(vert, false);
     }
 
     @Override
     public String toString() {
-        return "(" + x + ", " + y + ")";
+        return "(" + horiz + ", " + vert + ")";
     }
 
     private char revert(int i, boolean alpha) {

@@ -75,21 +75,44 @@ public class Minishogi {
         System.out.println("Captures lower: " + lowerCaptures.stream().map(Object::toString).collect(Collectors.joining(" ")));
         System.out.println();
 
-        board.printCheckStatus(upperTurn);
+        if (!gameRunning) {
+            System.out.println((!upperTurn ? "UPPER" : "lower") + " player wins.  " + getErrno());
+            return;
+        }
 
-        if (gameRunning) {
-            System.out.print((upperTurn ? "UPPER" : "lower") + ">");
-        } else {
-            if (uTurnCount >= 200 && lTurnCount >= 200) {
-                System.out.println("Tie game.  " + getErrno());
-            } else {
-                System.out.println((!upperTurn ? "UPPER" : "lower") + " player wins.  " + getErrno());
+        ArrayList<String> uncheckMoves = board.getCheckStatus(upperTurn);
+        if (uncheckMoves != null) {
+            if (uncheckMoves.isEmpty()) {
+                gameRunning = false;
+                System.out.println((!upperTurn ? "UPPER" : "lower") + " player wins.  Checkmate.");
+                return;
+            }
+
+            System.out.println((upperTurn ? "UPPER" : "lower") + " player is in check!");
+            System.out.println("Available moves:");
+            for (String move : uncheckMoves) {
+                System.out.println(move);
             }
         }
+
+        if (uTurnCount >= 200 && lTurnCount >= 200) {
+            System.out.println("Tie game.  Too many moves.");
+            gameRunning = false;
+            return;
+        }
+
+        System.out.print((upperTurn ? "UPPER" : "lower") + ">");
     }
 
     public void makeMove(String... cmd) {
         assert cmd.length > 2 : "invalid number of commands";
+
+        if (uTurnCount >= 200 && lTurnCount >= 200) {
+            gameRunning = false;
+            errno = "Too many moves.";
+            upperTurn = !upperTurn;
+            return;
+        }
 
         if (cmd[0].equals("move")) {
             GamePiece src = board.get(cmd[1]);
@@ -135,9 +158,21 @@ public class Minishogi {
 
             if (src instanceof Pawn) {
                 Coordinate c = board.convert(cmd[2]);
-                if (c.y == 0 || c.y == 4) {
+                if (c.vert == 0 || c.vert == 4) {
                     src.setPromoted(true);
                 }
+            }
+
+            // ensure not moving into check
+            board.set(cmd[2], src);
+            board.set(cmd[1], null);
+
+            if (board.getCheckStatus(upperTurn) != null) {
+                board.set(cmd[2], dst);
+                board.set(cmd[1], src);
+                errno = "Illegal move.";
+                gameRunning = false;
+                return;
             }
 
             // modification
@@ -166,8 +201,8 @@ public class Minishogi {
                     Coordinate place = board.convert(cmd[2]);
                     if ((upperTurn ? upperCaptures : lowerCaptures).get(i) instanceof Pawn) {
                         for (int r = 0; r < 5; r++) {
-                            if (r != place.y) {
-                                GamePiece gp = board.get(place.x, r);
+                            if (r != place.vert) {
+                                GamePiece gp = board.get(place.horiz, r);
                                 if (gp != null && gp instanceof Pawn && gp.isUpperPiece() == (upperTurn ? upperCaptures : lowerCaptures).get(i).isUpperPiece()) {
                                     errno = "Illegal move.";
                                     gameRunning = false;
@@ -178,8 +213,8 @@ public class Minishogi {
                     }
                     GamePiece gp = (upperTurn ? upperCaptures : lowerCaptures).get(i);
                     if (gp instanceof Pawn) {
-                        if ((gp.isUpperPiece() && place.y == 0) ||
-                                (!gp.isUpperPiece() && place.y == 4)) {
+                        if ((gp.isUpperPiece() && place.vert == 0) ||
+                                (!gp.isUpperPiece() && place.vert == 4)) {
                             errno = "Illegal move.";
                             gameRunning = false;
                             return;
@@ -200,12 +235,6 @@ public class Minishogi {
             uTurnCount++;
         } else {
             lTurnCount++;
-        }
-
-        if (uTurnCount >= 200 && lTurnCount >= 200) {
-            gameRunning = false;
-            errno = "Too many moves.";
-            return;
         }
 
         upperTurn = !upperTurn;
