@@ -20,8 +20,17 @@ public abstract class GamePiece {
 
     public abstract void setPromoted(boolean p);
 
+    /**
+     * @return Board-level representation of piece.
+     */
     public abstract String getRepr();
 
+    /**
+     * @param src String containing source coordinate.
+     * @param dst String containing destination coordinate.
+     * @param b Board currently working within.
+     * @return True means this GamePiece is able to move from src to dst.
+     */
     public abstract boolean validMove(String src, String dst, Board b);
 
     @Override

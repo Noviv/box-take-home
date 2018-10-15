@@ -9,6 +9,9 @@ import com.box.noviv.utils.Utils.TestCase;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+/**
+ * State machine for Minishogi.
+ */
 public class Minishogi {
     private TestCase tc;
     private Board board = new Board();
@@ -23,6 +26,9 @@ public class Minishogi {
     private int uTurnCount = 0;
     private int lTurnCount = 0;
 
+    /**
+     * @param filePath Path of initial test case file.
+     */
     public Minishogi(String filePath) {
         try {
             tc = Utils.parseTestCase(filePath);
@@ -60,14 +66,23 @@ public class Minishogi {
         }
     }
 
+    /**
+     * @return True if the state machine is in a valid/runnable state.
+     */
     public boolean isRunning() {
         return gameRunning;
     }
 
+    /**
+     * @return Get last error status.
+     */
     public String getErrno() {
         return errno;
     }
 
+    /**
+     * Print user input/status update to stdout.
+     */
     public void prompt() {
         System.out.println(Utils.stringifyBoard(board.getBoardData()));
         Collectors.joining(",");
@@ -104,6 +119,9 @@ public class Minishogi {
         System.out.print((upperTurn ? "UPPER" : "lower") + ">");
     }
 
+    /**
+     * @param cmd Array containing command/arguments to run in state machine.
+     */
     public void makeMove(String... cmd) {
         assert cmd.length > 2 : "invalid number of commands";
 
@@ -254,6 +272,10 @@ public class Minishogi {
     }
 
 
+    /**
+     * @param piece Parse piece from this string.
+     * @return GamePiece representing parsed string.
+     */
     private GamePiece getPiece(String piece) {
         boolean promote = piece.charAt(0) == '+';
         if (promote) {

@@ -18,6 +18,11 @@ public final class Coordinate {
         return "(" + horiz + ", " + vert + ")";
     }
 
+    /**
+     * @param i Integer in raw coodinate space.
+     * @param alpha Axis determination.
+     * @return Character represneting on element of one axis (determined by alpha).
+     */
     private char revert(int i, boolean alpha) {
         if (0 <= i && i <= 5) {
             return (char) ((alpha ? 'a' : '1') + i);

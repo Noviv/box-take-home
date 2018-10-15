@@ -75,27 +75,5 @@ public class Bishop extends GamePiece {
         }
 
         return true;
-
-//        if (Math.abs(dx) != Math.abs(dy)) {
-//            return false;
-//        }
-//
-//        int dxofs = dx > 0 ? -1 : 1;
-//        int dyofs = dy > 0 ? -1 : 1;
-//
-//        dx += dxofs;
-//        dy += dyofs;
-//
-//        while (dx != 0 && dy != 0) {
-//            System.err.println("trying " + (from.horiz + dx) + ", " + (from.vert + dy));
-//            if (b.get(from.horiz + dx, from.vert + dy) != null) {
-//                return false;
-//            }
-//
-//            dx += dxofs;
-//            dy += dyofs;
-//        }
-//
-//        return true;
     }
 }

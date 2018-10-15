@@ -4,14 +4,19 @@ import com.box.noviv.pieces.GamePiece;
 import com.box.noviv.pieces.King;
 import com.box.noviv.utils.Coordinate;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Backend data structure to track raw Board data.
+ */
 public class Board {
 
     private GamePiece[][] board;
 
+    /**
+     * Create new Board and default all GamePieces to null.
+     */
     public Board() {
         board = new GamePiece[5][5];
         for (char x = 0; x < 5; x++) {
@@ -21,6 +26,10 @@ public class Board {
         }
     }
 
+    /**
+     * @param c Char to convert. Will throw exception if not in coordinate system.
+     * @return Integer representation of char in coordinate system.
+     */
     private int convert(char c) {
         if ('1' <= c && c <= '5') {
             return c - '1';
@@ -33,34 +42,67 @@ public class Board {
         }
     }
 
+    /**
+     * @param pos String containing valid coordinates.
+     * @return New Coordinate object.
+     */
     public Coordinate convert(String pos) {
         return new Coordinate(convert(pos.charAt(0)), convert(pos.charAt(1)));
     }
 
+    /**
+     * @param x X coordinate (horizontal) of insertion.
+     * @param y Y coordinate (vertical) of insertion.
+     * @param v GamePiece to insert.
+     */
     public void set(int x, int y, GamePiece v) {
         board[y][x] = v;
     }
 
+    /**
+     * @param c Coordinate for insertion.
+     * @param v GamePiece to insert.
+     */
     public void set(Coordinate c, GamePiece v) {
         board[c.vert][c.horiz] = v;
     }
 
+    /**
+     * @param pos String containing coordinate for insertion.
+     * @param v GamePiece to insert.
+     */
     public void set(String pos, GamePiece v) {
         set(convert(pos), v);
     }
 
+    /**
+     * @param x X coordinate (horizontal) of retrieval.
+     * @param y Y coordinate (vertical) of retrieval.
+     * @return GamePiece at location.
+     */
     public GamePiece get(int x, int y) {
         return board[y][x];
     }
 
+    /**
+     * @param c Coordinate of retrieval.
+     * @return GamePiece at location.
+     */
     public GamePiece get(Coordinate c) {
         return board[c.vert][c.horiz];
     }
 
+    /**
+     * @param pos String containing coordinate of retrieval.
+     * @return GamePiece at location.
+     */
     public GamePiece get(String pos) {
         return get(convert(pos));
     }
 
+    /**
+     * @return Raw board data (meant to be passed to Utils).
+     */
     public String[][] getBoardData() {
         String[][] ret = new String[5][5];
 
@@ -78,6 +120,12 @@ public class Board {
         return ret;
     }
 
+    /**
+     * WIP: will not pick up non-King check recovery moves, or drops.
+     *
+     * @param upper Retrieve check status of upper player if true.
+     * @return Null if not in check(mate), ArrayList<String> containing possible King moves if in check(mate).
+     */
     public ArrayList<String> getCheckStatus(boolean upper) {
         ArrayList<GamePiece> attackers = new ArrayList<>();
         ArrayList<Coordinate> attackersC = new ArrayList<>();
