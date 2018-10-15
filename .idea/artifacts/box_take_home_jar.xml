@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="box-take-home:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/box_take_home_jar</output-path>
+    <root id="archive" name="box-take-home.jar">
+      <element id="module-output" name="box-take-home" />
+    </root>
+  </artifact>
+</component>
