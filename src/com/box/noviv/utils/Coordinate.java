@@ -19,7 +19,7 @@ public final class Coordinate {
     }
 
     /**
-     * @param i Integer in raw coodinate space.
+     * @param i     Integer in raw coodinate space.
      * @param alpha Axis determination.
      * @return Character represneting on element of one axis (determined by alpha).
      */

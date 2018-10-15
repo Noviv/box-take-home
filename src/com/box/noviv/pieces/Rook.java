@@ -4,34 +4,6 @@ import com.box.noviv.game.Board;
 import com.box.noviv.utils.Coordinate;
 
 public class Rook extends GamePiece {
-    @Override
-    public void setPromoted(boolean p) {
-        promoted = p;
-    }
-
-    @Override
-    public String getRepr() {
-        if (isPromoted()) {
-            return isUpperPiece() ? "+R" : "+r";
-        } else {
-            return isUpperPiece() ? "R" : "r";
-        }
-    }
-
-    @Override
-    public boolean validMove(String src, String dst, Board b) {
-        Coordinate from = b.convert(src);
-        Coordinate to = b.convert(dst);
-
-        if (isPromoted()) {
-            if (King.checkValidMove(from, to, b, isUpperPiece())) {
-                return true;
-            }
-        }
-
-        return checkValidMove(from, to, b, isUpperPiece());
-    }
-
     public static boolean checkValidMove(Coordinate from, Coordinate to, Board b, boolean upper) {
         if (b.get(to) != null && b.get(to).isUpperPiece() == upper) {
             return false;
@@ -64,5 +36,33 @@ public class Rook extends GamePiece {
         }
 
         return true;
+    }
+
+    @Override
+    public void setPromoted(boolean p) {
+        promoted = p;
+    }
+
+    @Override
+    public String getRepr() {
+        if (isPromoted()) {
+            return isUpperPiece() ? "+R" : "+r";
+        } else {
+            return isUpperPiece() ? "R" : "r";
+        }
+    }
+
+    @Override
+    public boolean validMove(String src, String dst, Board b) {
+        Coordinate from = b.convert(src);
+        Coordinate to = b.convert(dst);
+
+        if (isPromoted()) {
+            if (King.checkValidMove(from, to, b, isUpperPiece())) {
+                return true;
+            }
+        }
+
+        return checkValidMove(from, to, b, isUpperPiece());
     }
 }
